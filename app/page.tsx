@@ -458,6 +458,21 @@ function resolveDriveImage(url: string): string {
   }
 }
 
+// Pick a primary URL for a project (for JSON-LD ItemList)
+// Order: website > github > drive > fallback ke repo portfolio
+function getProjectPrimaryUrl(p: any): string {
+  try {
+    return (
+      p?.links?.website ||
+      p?.links?.github ||
+      p?.links?.drive ||
+      LINKS.github
+    );
+  } catch {
+    return LINKS.github;
+  }
+}
+
 export default function PortfolioDimasPrayoga() {
   const [lang, setLang] = useState("en");
   const t = i18n[lang as keyof typeof i18n];
@@ -522,10 +537,10 @@ export default function PortfolioDimasPrayoga() {
       sameAs: [LINKS.github, LINKS.linkedin, LINKS.tableau, LINKS.kaggle, LINKS.instagram],
     };
 
-    const projectItems = (i18n.en.projects.list || []).map((p, idx) => ({
+    const projectItems = (i18n.en.projects.list || []).map((p: any, idx: number) => ({
       "@type": "ListItem",
       position: idx + 1,
-      url: p.links?.github || LINKS.github,
+      url: getProjectPrimaryUrl(p),
       name: p.name,
       description: p.context,
     }));
@@ -585,61 +600,59 @@ export default function PortfolioDimasPrayoga() {
       </section>
     );
 
-    const ProjectCard: React.FC<{ p: any }> = ({ p }) => (
-      <article className="col-span-12 md:col-span-6 lg:col-span-4">
-        <div className="h-full rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow md:transition-shadow">
-          <div className="p-6 flex flex-col gap-4">
-            <h3 className="text-xl font-semibold text-gray-900">{p.name}</h3>
-            <ul className="text-sm text-gray-700 space-y-2">
-              <li><span className="font-semibold">Context:</span> {p.context}</li>
-              <li><span className="font-semibold">Data:</span> {p.data}</li>
-              <li><span className="font-semibold">Approach:</span> {p.approach}</li>
-              <li><span className="font-semibold">Tools:</span> {p.tools}</li>
-              <li><span className="font-semibold">Key Findings:</span> {p.findings}</li>
-              <li><span className="font-semibold">Impact:</span> {p.impact}</li>
-            </ul>
-    
-            <div className="flex gap-3 pt-2">
-              {p.links.github && (
-                <a
-                  href={p.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-                  aria-label="Open GitHub project"
-                >
-                  GitHub
-                </a>
-              )}
-              {p.links.drive && (
-                <a
-                  href={p.links.drive}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                  aria-label="Open Drive link"
-                >
-                  Drive
-                </a>
-              )}
-              {p.links.website && (
-                <a
-                  href={p.links.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
-                  aria-label="Open Website link"
-                >
-                  Website
-                </a>
-              )}
-            </div>
+  const ProjectCard: React.FC<{ p: any }> = ({ p }) => (
+    <article className="col-span-12 md:col-span-6 lg:col-span-4">
+      <div className="h-full rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow md:transition-shadow">
+        <div className="p-6 flex flex-col gap-4">
+          <h3 className="text-xl font-semibold text-gray-900">{p.name}</h3>
+          <ul className="text-sm text-gray-700 space-y-2">
+            <li><span className="font-semibold">Context:</span> {p.context}</li>
+            <li><span className="font-semibold">Data:</span> {p.data}</li>
+            <li><span className="font-semibold">Approach:</span> {p.approach}</li>
+            <li><span className="font-semibold">Tools:</span> {p.tools}</li>
+            <li><span className="font-semibold">Key Findings:</span> {p.findings}</li>
+            <li><span className="font-semibold">Impact:</span> {p.impact}</li>
+          </ul>
+
+          <div className="flex gap-3 pt-2">
+            {p?.links?.github && (
+              <a
+                href={p.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+                aria-label="Open GitHub project"
+              >
+                GitHub
+              </a>
+            )}
+            {p?.links?.drive && (
+              <a
+                href={p.links.drive}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                aria-label="Open Drive link"
+              >
+                Drive
+              </a>
+            )}
+            {p?.links?.website && (
+              <a
+                href={p.links.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-xl bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
+                aria-label="Open Website link"
+              >
+                Website
+              </a>
+            )}
           </div>
         </div>
-      </article>
-    );
-    
-    
+      </div>
+    </article>
+  );
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-900">
