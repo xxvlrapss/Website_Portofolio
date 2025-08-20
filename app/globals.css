@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth focus ring for accessibility */
+:focus-visible { outline: none; box-shadow: 0 0 0 2px currentColor; }
